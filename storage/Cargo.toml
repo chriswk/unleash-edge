@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+default = []
+red = ["redis"]
 
 [dependencies]
 types = { path = "../types" }
@@ -12,3 +15,5 @@ chrono = { version = "0.4.23", features = ["serde"] }
 serde = { version = "1.0.147", features = ["derive"] }
 serde_json = "1.0.89"
 unleash-types = { version = "0.2.0" }
+dashmap = { version = "5.4.0", features = ["serde"] }
+redis = { version = "0.22.1", optional = true}

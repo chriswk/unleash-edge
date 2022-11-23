@@ -1,28 +1,19 @@
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
-use types::{EdgeError, EdgeResult};
+use types::{EdgeError, EdgeResult, EdgeToken};
 use unleash_types::client_features::ClientFeatures;
 
 pub mod memory;
+#[cfg(feature = "red")]
+pub mod redis;
+#[cfg(feature = "aws")]
+pub mod s3;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-pub enum ApiTokenType {
-    Client,
-    Admin,
-    Frontend,
+
+pub struct EdgeData {
+    pub tokens:
 }
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-pub struct EdgeToken {
-    token: String,
-    environment: String,
-    projects: Vec<String>,
-    token_type: ApiTokenType,
-    dynamic: bool,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct Status {
     pub ready: bool,
@@ -51,7 +42,7 @@ pub trait ToggleSource {
 
 #[async_trait]
 pub trait StatusSink {
-    async fn set_status(&self, status: Status) -> EdgeResult<()>;
+    async fn set_status(&mut self, status: Status) -> EdgeResult<()>;
 }
 
 #[async_trait]
