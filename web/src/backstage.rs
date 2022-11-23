@@ -1,13 +1,15 @@
+use actix_web::{get, web, HttpResponse, Responder};
+
 #[get("/metrics")]
-async fn metrics(c: Data<Manager>, _req: HttpRequest) -> impl Responder {
-    let metrics = c.metrics();
-    let encoder = TextEncoder::new();
-    let mut buffer = vec![];
-    encoder.encode(&metrics, &mut buffer).unwrap();
-    HttpResponse::Ok().body(buffer)
+async fn metrics() -> impl Responder {
+    HttpResponse::Ok().finish()
 }
 
 #[get("/health")]
-async fn health(_: HttpRequest) -> impl Responder {
+async fn health() -> impl Responder {
     HttpResponse::Ok().json("healthy")
+}
+
+pub fn configure_backstage(cfg: &mut web::ServiceConfig) {
+    cfg.service(metrics).service(health);
 }

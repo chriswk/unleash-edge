@@ -1,12 +1,12 @@
 use crate::{
-    EdgeResult, EdgeToken, Repository, Status, StatusRepository, StatusSink, StatusSource,
-    ToggleRepository, ToggleSink, ToggleSource, TokenStore,
+    Repository, Status, StatusRepository, StatusSink, StatusSource, ToggleRepository, ToggleSink,
+    ToggleSource, TokenStore,
 };
 use async_trait::async_trait;
 use dashmap::DashMap;
 use std::sync::Arc;
+use types::{EdgeResult, EdgeToken};
 use unleash_types::client_features::ClientFeatures;
-use types::EdgeToken;
 
 #[derive(Clone)]
 pub struct InMemoryRepository {
@@ -90,14 +90,4 @@ impl Repository for InMemoryRepository {}
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    impl InMemoryRepository {
-        pub fn new() -> Self {
-            let repo = InMemoryRepository::default();
-        }
-    }
-
-    #[test]
-    pub fn
-
 }

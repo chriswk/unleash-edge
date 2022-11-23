@@ -8,10 +8,12 @@ async fn fetch_client_features(
 ) -> EdgeResult<ClientFeatures> {
     let result = client
         .get(unleash_url)
+        .header("Authorization", unleash_token)
+        .send()
         .await
         .map_err(|_| EdgeError::UnleashApiError)?;
     result
         .json::<ClientFeatures>()
         .await
-        .map_err(|_| EdgeError::UnleashJsonError)?
+        .map_err(|_| EdgeError::UnleashJsonError)
 }

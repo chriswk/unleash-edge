@@ -10,10 +10,6 @@ pub mod redis;
 #[cfg(feature = "aws")]
 pub mod s3;
 
-
-pub struct EdgeData {
-    pub tokens:
-}
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct Status {
     pub ready: bool,
