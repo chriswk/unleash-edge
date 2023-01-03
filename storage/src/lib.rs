@@ -33,7 +33,7 @@ pub trait ToggleSink {
 
 #[async_trait]
 pub trait ToggleSource {
-    async fn read_raw_toggles(&self, env: String) -> EdgeResult<Option<ClientFeatures>>;
+    async fn read_raw_toggles(&self, env: &String) -> EdgeResult<Option<ClientFeatures>>;
 }
 
 #[async_trait]

@@ -13,15 +13,20 @@ types = { path = "../types" }
 storage = { path = "../storage" }
 fetcher = { path = "../fetcher" }
 actix-web = { version = "4.2.1", features = ["rustls"] }
+actix-utils = { version = "3.0.1" }
 clap = { version = "4.0.26", features = ["env", "derive"] }
 futures = "0.3.25"
 opentelemetry = { version = "0.18.0", features = ["trace", "rt-tokio"]}
 opentelemetry-otlp = { version = "0.11.0", features = ["tokio"], optional = true }
+opentelemetry-prometheus = { version = "0.11.0" }
 prometheus = { version = "0.13.3" }
-serde = { version = "1.0.147", features = ["derive"] }
-serde_json = "1.0.88"
+sdk-core = { git = "https://github.com/sighphyre/yggdrasil", branch = "main" }
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.91"
 tokio = { version = "1.22.0", features = ["macros", "rt-multi-thread"] }
 tonic = { version = "0.8.2", optional = true }
 tracing = "0.1.37"
 tracing-opentelemetry = "0.18.0"
 tracing-subscriber = { version = "0.3.16", features = ["json", "env-filter"] }
+unleash-types = { version = "0.3.0" }
+chrono = { version = "0.4.23", features = ["serde"] }

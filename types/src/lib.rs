@@ -1,5 +1,11 @@
+use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
+use actix_web::http::StatusCode;
+use actix_web::{HttpResponse, ResponseError};
+use actix_web::body::BoxBody;
+
+pub mod extractors;
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 pub enum EdgeError {
@@ -7,9 +13,40 @@ pub enum EdgeError {
     UnleashJsonError,
     FailedToAcquireLock,
     CouldNotBind,
+    CouldNotParseQuery,
+    InvalidHeaderValue,
+    AuthorizationDenied,
+    NoToken,
+}
+
+impl Display for EdgeError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&*self.to_string())
+    }
 }
 
 pub type EdgeResult<T> = Result<T, EdgeError>;
+
+impl ResponseError for EdgeError {
+    fn status_code(&self) -> StatusCode {
+        match self {
+            UnleashApiError => StatusCode::INTERNAL_SERVER_ERROR,
+            UnleashJsonError => StatusCode::BAD_REQUEST,
+            FailedToAcquireLock => StatusCode::CONFLICT,
+            CouldNotBind => StatusCode::INTERNAL_SERVER_ERROR,
+            CouldNotParse => StatusCode::BAD_REQUEST,
+            InvalidHeaderValue=> StatusCode::BAD_REQUEST,
+            AuthorizationDenied => StatusCode::FORBIDDEN,
+            NoToken => StatusCode::UNAUTHORIZED,
+        }
+    }
+
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        match self.status_code() {
+            _ => HttpResponse::build(self.status_code()).finish()
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Clone)]
 pub enum ApiToken {
@@ -33,34 +70,4 @@ pub struct EdgeToken {
     pub dynamic: bool,
 }
 
-impl FromStr for EdgeToken {
-    type Err = EdgeError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let token_parts: Vec<String> = s
-            .clone()
-            .split(":")
-            .take(2)
-            .map(|s| s.to_string())
-            .collect();
-        let token_projects = if token_parts.get(0).unwrap() == "[]" {
-            vec![]
-        } else {
-            vec![token_parts.get(0).unwrap().clone()]
-        };
-        let env_token: Vec<String> = token_parts
-            .get(1)
-            .unwrap()
-            .split(".")
-            .take(2)
-            .map(|s| s.to_string())
-            .collect();
-        Ok(EdgeToken {
-            token: env_token.get(1).unwrap().clone(),
-            environment: env_token.get(0).unwrap().clone(),
-            projects: token_projects,
-            token_type: ApiToken::Undecided,
-            dynamic: false,
-        })
-    }
-}

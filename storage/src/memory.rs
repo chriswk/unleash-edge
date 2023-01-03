@@ -33,8 +33,8 @@ impl ToggleSink for InMemoryRepository {
 }
 #[async_trait]
 impl ToggleSource for InMemoryRepository {
-    async fn read_raw_toggles(&self, env: String) -> EdgeResult<Option<ClientFeatures>> {
-        Ok(self.toggle_store.get(&env).map(|features| features.clone()))
+    async fn read_raw_toggles(&self, env: &String) -> EdgeResult<Option<ClientFeatures>> {
+        Ok(self.toggle_store.get(env).map(|features| features.clone()))
     }
 }
 
