@@ -6,8 +6,8 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Registry};
 mod backstage;
 use types::EdgeError;
-mod telemetry;
 mod proxy;
+mod telemetry;
 
 pub type EdgeJsonResult<T> = Result<Json<T>, EdgeError>;
 
@@ -43,8 +43,6 @@ async fn main() -> Result<(), EdgeError> {
         .with(env_filter);
     #[cfg(not(feature = "telemetry"))]
     let collector = Registry::default().with(logger).with(env_filter);
-
-
 
     // Initialize tracing
     tracing::subscriber::set_global_default(collector).unwrap();
