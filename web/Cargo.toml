@@ -34,3 +34,6 @@ opentelemetry-semantic-conventions = "0.10.0"
 actix-http = "3.2.2"
 futures-util = { version = "0.3.25", features = ["tokio-io"] }
 actix-web-opentelemetry = { version = "0.13.0", features = ["metrics", "metrics-prometheus"] }
+tokio-util = { version = "0.7.4", features = ["tracing"] }
+dotenv = { version = "0.15.0", features = ["clap"] }
+reqwest = "0.11.13"

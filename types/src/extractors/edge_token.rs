@@ -2,7 +2,7 @@ use crate::{ApiToken, EdgeError, EdgeResult, EdgeToken};
 use actix_utils::future::{ready, Ready};
 use actix_web::dev::Payload;
 use actix_web::http::header::HeaderValue;
-use actix_web::{FromRequest, HttpRequest};
+use actix_web::{web, FromRequest, HttpRequest};
 use std::str::FromStr;
 
 impl FromRequest for EdgeToken {

@@ -17,6 +17,7 @@ pub enum EdgeError {
     InvalidHeaderValue,
     AuthorizationDenied,
     NoToken,
+    NoHttpClient,
 }
 
 impl Display for EdgeError {
@@ -38,6 +39,7 @@ impl ResponseError for EdgeError {
             Self::InvalidHeaderValue => StatusCode::BAD_REQUEST,
             Self::AuthorizationDenied => StatusCode::FORBIDDEN,
             Self::NoToken => StatusCode::UNAUTHORIZED,
+            Self::NoHttpClient => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

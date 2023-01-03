@@ -5,6 +5,8 @@ use clap::Parser;
 use opentelemetry::global;
 use opentelemetry::sdk::export::metrics::aggregation;
 use opentelemetry::sdk::metrics::{controllers, processors, selectors};
+use reqwest::ClientBuilder;
+use std::sync::Arc;
 use tracing::info;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Registry};
@@ -12,13 +14,14 @@ use tracing_subscriber::{EnvFilter, Registry};
 mod backstage;
 use types::EdgeError;
 
+mod item_cache;
 mod proxy;
 mod telemetry;
 
 pub type EdgeJsonResult<T> = Result<Json<T>, EdgeError>;
 
-#[derive(Parser)]
-pub struct EdgeFeatures {
+#[derive(Parser, Debug, Clone)]
+pub struct EdgeConfig {
     /// URL to use to connect to Unleash API Server or another Unleash Edge server
     #[clap(short, long, env)]
     pub unleash_url: String,
@@ -34,10 +37,19 @@ pub struct EdgeFeatures {
     /// Which ip should Edge bind to
     #[clap(short, long, env, default_value = "0.0.0.0")]
     pub ip: Option<String>,
+
+    /// How often to refresh features for a client key (in seconds)
+    #[clap(short, long, env, default_value_t = 15)]
+    pub client_feature_refresh_interval: u64,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), EdgeError> {
+    // Dotenv
+    dotenv::dotenv().ok();
+    // Parse Unleash Edge Options
+    let args = EdgeConfig::parse();
+
     #[cfg(feature = "telemetry")]
     let telemetry = tracing_opentelemetry::layer().with_tracer(telemetry::init_tracer());
     let logger = tracing_subscriber::fmt::layer();
@@ -71,15 +83,21 @@ async fn main() -> Result<(), EdgeError> {
     };
     let meter = global::meter("actix_web");
     let request_metrics = RequestMetricsBuilder::new().build(meter);
-    let toggle_source = Data::new(storage::memory::InMemoryRepository::default());
-    // Parse Unleash Edge Options
-    let args = EdgeFeatures::parse();
+
+    // Configure refreshing of data
+    let toggle_source = Arc::new(storage::memory::InMemoryRepository::default());
+    let http_client = ClientBuilder::new()
+        .build()
+        .map_err(|_| EdgeError::NoHttpClient)?;
+    let (toggle_cache, toggle_refresher, toggle_refresh_cancel) =
+        item_cache::init_token_refresher(toggle_source.clone(), http_client.clone(), args.clone());
     let server = HttpServer::new(move || {
         App::new()
             .wrap(RequestTracing::new())
             .wrap(request_metrics.clone())
             .wrap(middleware::Logger::default().exclude("/internal-backstage"))
-            .app_data(toggle_source.clone())
+            .app_data(Data::new(toggle_source.clone()))
+            .app_data(Data::new(toggle_cache.clone()))
             .service(
                 web::resource("/internal-backstage/metrics")
                     .route(web::get().to(metrics_handler.clone())),
@@ -95,7 +113,11 @@ async fn main() -> Result<(), EdgeError> {
     .expect("Can not bind")
     .shutdown_timeout(5);
     tokio::select! {
-        _ = server.run() => info!("Actix has now exited")
+        _ = server.run() => {
+            toggle_refresh_cancel.cancel();
+            toggle_refresher.await.unwrap();
+            info!("Actix has now exited");
+        }
     }
     Ok(())
 }

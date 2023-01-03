@@ -5,8 +5,9 @@ use sdk_core::state::InnerContext;
 use sdk_core::EngineState;
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::sync::Arc;
 use storage::memory::InMemoryRepository;
-use storage::ToggleSource;
+use storage::{FullState, Repository, ToggleSource};
 use types::{EdgeError, EdgeToken};
 use unleash_types::client_features::Payload;
 use unleash_types::frontend::{EvaluatedToggle, EvaluatedVariant, FrontendResult};
@@ -23,7 +24,7 @@ pub struct QueryData {
 
 async fn evaluate_toggles(
     token: EdgeToken,
-    client_features_provider: Data<InMemoryRepository>,
+    all_tokens: Data<Arc<FullState>>,
     req: HttpRequest,
 ) -> EdgeJsonResult<FrontendResult> {
     let unleash_context = web::Query::<QueryData>::from_query(req.query_string())
@@ -41,42 +42,41 @@ async fn evaluate_toggles(
             }
         })
         .unwrap_or(InnerContext::default());
-    client_features_provider
+    let res = all_tokens
         .get_ref()
-        .read_raw_toggles(&token.environment)
-        .await
-        .map(|client_features| {
-            if let Some(features) = client_features {
-                let mut state = EngineState::new();
-                state.take_state(features.clone());
-                let evaluated_toggles: Vec<EvaluatedToggle> = features
-                    .features
-                    .into_iter()
-                    .map(|toggle| {
-                        let variant = state.get_variant(toggle.name.clone(), &unleash_context);
-                        EvaluatedToggle {
-                            name: toggle.name.clone(),
-                            enabled: state.is_enabled(toggle.name, &unleash_context),
-                            variant: EvaluatedVariant {
-                                name: variant.name,
-                                enabled: variant.enabled,
-                                payload: variant.payload.map(|succ| Payload {
-                                    payload_type: succ.payload_type,
-                                    value: succ.value,
-                                }),
-                            },
-                            impression_data: false,
-                        }
-                    })
-                    .collect();
-                FrontendResult {
-                    toggles: evaluated_toggles,
-                }
-            } else {
-                FrontendResult { toggles: vec![] }
+        .data
+        .get(&token.token)
+        .map(|c| {
+            let mut state = EngineState::new();
+            state.take_state(c.client_features.clone());
+            let evaluated_toggles: Vec<EvaluatedToggle> = c
+                .client_features
+                .features
+                .clone()
+                .into_iter()
+                .map(|toggle| {
+                    let variant = state.get_variant(toggle.name.clone(), &unleash_context);
+                    EvaluatedToggle {
+                        name: toggle.name.clone(),
+                        enabled: state.is_enabled(toggle.name, &unleash_context),
+                        variant: EvaluatedVariant {
+                            name: variant.name,
+                            enabled: variant.enabled,
+                            payload: variant.payload.map(|succ| Payload {
+                                payload_type: succ.payload_type,
+                                value: succ.value,
+                            }),
+                        },
+                        impression_data: false,
+                    }
+                })
+                .collect();
+            FrontendResult {
+                toggles: evaluated_toggles,
             }
         })
-        .map(Json)
+        .unwrap_or(FrontendResult { toggles: vec![] });
+    Ok(Json(res))
 }
 
 pub fn configure_proxy(cfg: &mut web::ServiceConfig) {

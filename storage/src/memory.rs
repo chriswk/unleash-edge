@@ -1,6 +1,6 @@
 use crate::{
-    Repository, Status, StatusRepository, StatusSink, StatusSource, ToggleRepository, ToggleSink,
-    ToggleSource, TokenStore,
+    FullState, InitRepository, Repository, Status, StatusRepository, StatusSink, StatusSource,
+    ToggleRepository, ToggleSink, ToggleSource, TokenStore,
 };
 use async_trait::async_trait;
 use dashmap::DashMap;
@@ -83,6 +83,19 @@ impl TokenStore for InMemoryRepository {
 }
 #[async_trait]
 impl ToggleRepository for InMemoryRepository {}
+
+impl InitRepository for InMemoryRepository {
+    fn init(&self) -> FullState {
+        FullState {
+            status: Status {
+                ready: false,
+                error: None,
+                last_fetch: None,
+            },
+            data: DashMap::new(),
+        }
+    }
+}
 
 #[async_trait]
 impl Repository for InMemoryRepository {}
