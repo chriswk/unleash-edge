@@ -30,3 +30,7 @@ tracing-opentelemetry = "0.18.0"
 tracing-subscriber = { version = "0.3.16", features = ["json", "env-filter"] }
 unleash-types = { version = "0.3.0" }
 chrono = { version = "0.4.23", features = ["serde"] }
+opentelemetry-semantic-conventions = "0.10.0"
+actix-http = "3.2.2"
+futures-util = { version = "0.3.25", features = ["tokio-io"] }
+actix-web-opentelemetry = { version = "0.13.0", features = ["metrics", "metrics-prometheus"] }

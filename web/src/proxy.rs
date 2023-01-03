@@ -1,13 +1,12 @@
 use crate::EdgeJsonResult;
 use actix_web::web::{Data, Json};
-use actix_web::{get, web, HttpRequest};
+use actix_web::{web, HttpRequest};
 use sdk_core::state::InnerContext;
 use sdk_core::EngineState;
 use serde::Deserialize;
 use std::collections::HashMap;
 use storage::memory::InMemoryRepository;
 use storage::ToggleSource;
-use tracing::info;
 use types::{EdgeError, EdgeToken};
 use unleash_types::client_features::Payload;
 use unleash_types::frontend::{EvaluatedToggle, EvaluatedVariant, FrontendResult};

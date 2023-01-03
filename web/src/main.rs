@@ -1,11 +1,17 @@
 use actix_web::web::{Data, Json};
 use actix_web::{middleware, web, App, HttpServer};
+use actix_web_opentelemetry::{PrometheusMetricsHandler, RequestMetricsBuilder, RequestTracing};
 use clap::Parser;
+use opentelemetry::global;
+use opentelemetry::sdk::export::metrics::aggregation;
+use opentelemetry::sdk::metrics::{controllers, processors, selectors};
 use tracing::info;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Registry};
+
 mod backstage;
 use types::EdgeError;
+
 mod proxy;
 mod telemetry;
 
@@ -24,6 +30,10 @@ pub struct EdgeFeatures {
     /// Which port should Edge bind to
     #[clap(short, long, env)]
     pub port: Option<u16>,
+
+    /// Which ip should Edge bind to
+    #[clap(short, long, env, default_value = "0.0.0.0")]
+    pub ip: Option<String>,
 }
 
 #[tokio::main]
@@ -46,17 +56,41 @@ async fn main() -> Result<(), EdgeError> {
 
     // Initialize tracing
     tracing::subscriber::set_global_default(collector).unwrap();
+    let metrics_handler = {
+        let controller = controllers::basic(
+            processors::factory(
+                selectors::simple::histogram([1.0, 2.0, 5.0, 10.0, 20.0, 50.0]),
+                aggregation::cumulative_temporality_selector(),
+            )
+            .with_memory(true),
+        )
+        .build();
+
+        let exporter = opentelemetry_prometheus::exporter(controller).init();
+        PrometheusMetricsHandler::new(exporter)
+    };
+    let meter = global::meter("actix_web");
+    let request_metrics = RequestMetricsBuilder::new().build(meter);
+    let toggle_source = Data::new(storage::memory::InMemoryRepository::default());
     // Parse Unleash Edge Options
     let args = EdgeFeatures::parse();
     let server = HttpServer::new(move || {
-        let toggle_source = storage::memory::InMemoryRepository::default();
         App::new()
-            .app_data(Data::new(toggle_source))
+            .wrap(RequestTracing::new())
+            .wrap(request_metrics.clone())
             .wrap(middleware::Logger::default().exclude("/internal-backstage"))
+            .app_data(toggle_source.clone())
+            .service(
+                web::resource("/internal-backstage/metrics")
+                    .route(web::get().to(metrics_handler.clone())),
+            )
             .service(web::scope("/internal-backstage").configure(backstage::configure_backstage))
             .service(web::scope("/api").configure(proxy::configure_proxy))
     })
-    .bind(("0.0.0.0", args.port.unwrap_or(3001)))
+    .bind((
+        args.ip.unwrap_or("0.0.0.0".into()),
+        args.port.unwrap_or(3001),
+    ))
     .map_err(|_| EdgeError::CouldNotBind)
     .expect("Can not bind")
     .shutdown_timeout(5);

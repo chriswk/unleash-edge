@@ -9,7 +9,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57a7559404a7f3573127aab53c08ce37a6c6a315c374a31070f3c91cd1b4a7fe"
 dependencies = [
  "bitflags",
- "bytes",
+ "bytes 1.3.0",
  "futures-core",
  "futures-sink",
  "log",
@@ -34,7 +34,7 @@ dependencies = [
  "base64",
  "bitflags",
  "brotli",
- "bytes",
+ "bytes 1.3.0",
  "bytestring",
  "derive_more",
  "encoding_rs",
@@ -164,7 +164,7 @@ dependencies = [
  "actix-utils",
  "actix-web-codegen",
  "ahash",
- "bytes",
+ "bytes 1.3.0",
  "bytestring",
  "cfg-if",
  "cookie",
@@ -199,6 +199,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "actix-web-opentelemetry"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aaa592a5b9b3d96101434bca1024c6da6c23630163aec485428e613cd7100dcf"
+dependencies = [
+ "actix-http",
+ "actix-web",
+ "futures-util",
+ "opentelemetry",
+ "opentelemetry-prometheus",
+ "opentelemetry-semantic-conventions",
+ "prometheus",
+ "serde",
 ]
 
 [[package]]
@@ -315,7 +331,7 @@ dependencies = [
  "async-trait",
  "axum-core",
  "bitflags",
- "bytes",
+ "bytes 1.3.0",
  "futures-util",
  "http",
  "http-body",
@@ -342,7 +358,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37e5939e02c56fecd5c017c37df4238c0a839fa76b7f97acdd7efb804fd181cc"
 dependencies = [
  "async-trait",
- "bytes",
+ "bytes 1.3.0",
  "futures-util",
  "http",
  "http-body",
@@ -400,6 +416,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "572f695136211188308f16ad2ca5c851a712c464060ae6974944458eb83880ba"
 
 [[package]]
+name = "byteorder"
+version = "1.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
+
+[[package]]
+name = "bytes"
+version = "0.4.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "206fdffcfa2df7cbe15601ef46c813fce0965eb3286db6b56c583b814b51c81c"
+dependencies = [
+ "byteorder",
+ "iovec",
+]
+
+[[package]]
 name = "bytes"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -411,7 +443,7 @@ version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7f83e57d9154148e355404702e2694463241880b939570d7c97c014da7a69a1"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
 ]
 
 [[package]]
@@ -498,7 +530,7 @@ version = "4.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "memchr",
 ]
 
@@ -753,6 +785,12 @@ dependencies = [
 
 [[package]]
 name = "futures"
+version = "0.1.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a471a38ef8ed83cd6e40aa59c1ffe17db6855c18e3604d9c4ed8c08ebc28678"
+
+[[package]]
+name = "futures"
 version = "0.3.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38390104763dc37a5145a53c29c63c1290b5d316d6086ec32c293f6736051bb0"
@@ -838,6 +876,7 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
+ "tokio-io",
 ]
 
 [[package]]
@@ -867,7 +906,7 @@ version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f9f29bc9dda355256b2916cf526ab02ce0aeaaaf2bad60d65ef3f12f11dd0f4"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "fnv",
  "futures-core",
  "futures-sink",
@@ -907,7 +946,7 @@ version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75f43d41e26995c17e71ee126451dd3941010b0514a81a9d11f3b341debc2399"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "fnv",
  "itoa",
 ]
@@ -918,7 +957,7 @@ version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d5f38f16d184e36f2408a55281cd658ecbd3ca05cce6d6510a176eca393e26d1"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "http",
  "pin-project-lite",
 ]
@@ -947,7 +986,7 @@ version = "0.14.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "034711faac9d2166cb1baf1a2fb0b60b1f277f8492fd72176c17f3515e1abd3c"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "futures-channel",
  "futures-core",
  "futures-util",
@@ -983,7 +1022,7 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6183ddfa99b85da61a140bea0efc93fdf56ceaa041b37d553518030827f9905"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "hyper",
  "native-tls",
  "tokio",
@@ -1041,6 +1080,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a5bbe824c507c5da5956355e86a746d82e0e1464f65d862cc5e71da70e94b2c"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "iovec"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2b3ea6ff95e175473f8ffe6a7eb7c00d054240321b84c57051175fe3c1e075e"
+dependencies = [
+ "libc",
 ]
 
 [[package]]
@@ -1331,7 +1379,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d1c928609d087790fc936a1067bdc310ae702bdf3b090c3f281b713622c8bbde"
 dependencies = [
  "async-trait",
- "futures",
+ "futures 0.3.25",
  "futures-util",
  "http",
  "opentelemetry",
@@ -1359,12 +1407,21 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d61a2f56df5574508dd86aaca016c917489e589ece4141df1b5e349af8d66c28"
 dependencies = [
- "futures",
+ "futures 0.3.25",
  "futures-util",
  "opentelemetry",
  "prost",
  "tonic",
  "tonic-build",
+]
+
+[[package]]
+name = "opentelemetry-semantic-conventions"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b02e0230abb0ab6636d18e2ba8fa02903ea63772281340ccac18e0af3ec9eeb"
+dependencies = [
+ "opentelemetry",
 ]
 
 [[package]]
@@ -1614,7 +1671,7 @@ version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0841812012b2d4a6145fae9a6af1534873c32aa67fff26bd09f8fa42c83f95a"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "prost-derive",
 ]
 
@@ -1624,7 +1681,7 @@ version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d8b442418ea0822409d9e7d047cbf1e7e9e1760b172bf9982cf29d517c93511"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "heck",
  "itertools",
  "lazy_static",
@@ -1659,7 +1716,7 @@ version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "747761bc3dc48f9a34553bf65605cf6cb6288ba219f3450b4275dbd81539551a"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "prost",
 ]
 
@@ -1773,7 +1830,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68cc60575865c7831548863cc02356512e3f1dc2f3f82cb837d7fc4cc8f3c97c"
 dependencies = [
  "base64",
- "bytes",
+ "bytes 1.3.0",
  "encoding_rs",
  "futures-core",
  "futures-util",
@@ -2185,7 +2242,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d76ce4a75fb488c605c54bf610f221cea8b0dafb53333c1a67e8ee199dcd2ae3"
 dependencies = [
  "autocfg",
- "bytes",
+ "bytes 1.3.0",
  "libc",
  "memchr",
  "mio",
@@ -2196,6 +2253,17 @@ dependencies = [
  "socket2",
  "tokio-macros",
  "winapi",
+]
+
+[[package]]
+name = "tokio-io"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57fc868aae093479e3131e3d165c93b1c7474109d13c90ec0dda2a1bbfff0674"
+dependencies = [
+ "bytes 0.4.12",
+ "futures 0.1.31",
+ "log",
 ]
 
 [[package]]
@@ -2257,7 +2325,7 @@ version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bb2e075f03b3d66d8d8785356224ba688d2906a371015e225beeb65ca92c740"
 dependencies = [
- "bytes",
+ "bytes 1.3.0",
  "futures-core",
  "futures-sink",
  "pin-project-lite",
@@ -2275,7 +2343,7 @@ dependencies = [
  "async-trait",
  "axum",
  "base64",
- "bytes",
+ "bytes 1.3.0",
  "futures-core",
  "futures-util",
  "h2",
@@ -2337,7 +2405,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c530c8675c1dbf98facee631536fa116b5fb6382d7dd6dc1b118d970eafe3ba"
 dependencies = [
  "bitflags",
- "bytes",
+ "bytes 1.3.0",
  "futures-core",
  "futures-util",
  "http",
@@ -2671,15 +2739,19 @@ checksum = "1c38c045535d93ec4f0b4defec448e4291638ee608530863b1e2ba115d4fff7f"
 name = "web"
 version = "0.1.0"
 dependencies = [
+ "actix-http",
  "actix-utils",
  "actix-web",
+ "actix-web-opentelemetry",
  "chrono",
  "clap",
  "fetcher",
- "futures",
+ "futures 0.3.25",
+ "futures-util",
  "opentelemetry",
  "opentelemetry-otlp",
  "opentelemetry-prometheus",
+ "opentelemetry-semantic-conventions",
  "prometheus",
  "sdk-core",
  "serde",

@@ -1,9 +1,9 @@
-use std::fmt::{Display, Formatter};
-use serde::{Deserialize, Serialize};
-use std::str::FromStr;
+use actix_web::body::BoxBody;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
-use actix_web::body::BoxBody;
+use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 pub mod extractors;
 
@@ -30,20 +30,20 @@ pub type EdgeResult<T> = Result<T, EdgeError>;
 impl ResponseError for EdgeError {
     fn status_code(&self) -> StatusCode {
         match self {
-            UnleashApiError => StatusCode::INTERNAL_SERVER_ERROR,
-            UnleashJsonError => StatusCode::BAD_REQUEST,
-            FailedToAcquireLock => StatusCode::CONFLICT,
-            CouldNotBind => StatusCode::INTERNAL_SERVER_ERROR,
-            CouldNotParse => StatusCode::BAD_REQUEST,
-            InvalidHeaderValue=> StatusCode::BAD_REQUEST,
-            AuthorizationDenied => StatusCode::FORBIDDEN,
-            NoToken => StatusCode::UNAUTHORIZED,
+            Self::UnleashApiError => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::UnleashJsonError => StatusCode::BAD_REQUEST,
+            Self::FailedToAcquireLock => StatusCode::CONFLICT,
+            Self::CouldNotBind => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::CouldNotParseQuery => StatusCode::BAD_REQUEST,
+            Self::InvalidHeaderValue => StatusCode::BAD_REQUEST,
+            Self::AuthorizationDenied => StatusCode::FORBIDDEN,
+            Self::NoToken => StatusCode::UNAUTHORIZED,
         }
     }
 
     fn error_response(&self) -> HttpResponse<BoxBody> {
         match self.status_code() {
-            _ => HttpResponse::build(self.status_code()).finish()
+            _ => HttpResponse::build(self.status_code()).finish(),
         }
     }
 }
@@ -69,5 +69,3 @@ pub struct EdgeToken {
     pub token_type: ApiToken,
     pub dynamic: bool,
 }
-
-
