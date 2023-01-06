@@ -10,5 +10,5 @@ storage = { path = "../storage" }
 types = { path = "../types" }
 unleash-types = "0.2.0"
 reqwest = { version = "0.11.13", features = ["json", "rustls"] }
-tokio = { version = "1.22.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.23.1", features = ["macros", "rt-multi-thread"] }
 tracing = "0.1.37"
